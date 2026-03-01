@@ -1,0 +1,158 @@
+---
+interface Props {
+	x: number;
+	y: number;
+	color: string;
+	size: number;
+	glow: number;
+	beamLen: number;
+	beamW: number;
+	pulseDelay: string;
+	name: string;
+	birthYear: string;
+	deathYear: string;
+	starLabel: string;
+}
+
+const {
+	x,
+	y,
+	color,
+	size,
+	glow,
+	beamLen,
+	beamW,
+	pulseDelay,
+	name,
+	birthYear,
+	deathYear,
+	starLabel,
+} = Astro.props;
+---
+
+<div
+	class="star group"
+	style={`left:${x}%;top:${y}%;--color:${color};--size:${size}px;--glow:${glow};--beam-len:${beamLen}px;--beam-w:${beamW}px;--pulse-delay:${pulseDelay}s;`}
+>
+	<div
+		class="gap-0.2 pointer-events-none absolute top-[calc(100%+10px)] left-1/2 z-50 flex -translate-x-1/2 translate-y-1 flex-col items-center whitespace-nowrap opacity-0 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100"
+	>
+		<span class="text-[.6rem] font-semibold tracking-wide text-white"
+			>{name}</span
+		>
+		<span class="text-[.5rem] tracking-wider text-white/60"
+			>{birthYear} – {deathYear}</span
+		>
+		<span class="text-[.5rem] tracking-widest" style={`color:${color};`}
+			>{starLabel}</span
+		>
+	</div>
+</div>
+
+<style is:global>
+	.star {
+		position: absolute;
+		width: var(--size);
+		height: var(--size);
+		transform: translate(-50%, -50%);
+		border-radius: 50%;
+		background: radial-gradient(
+			circle,
+			#fff 0%,
+			var(--color) 60%,
+			transparent 100%
+		);
+		opacity: var(--glow);
+		box-shadow:
+			0 0 calc(var(--size) * 1) calc(var(--size) * 0.3) var(--color),
+			0 0 calc(var(--size) * 2.5) calc(var(--size) * 0.6)
+				color-mix(in srgb, var(--color) 40%, transparent);
+		cursor: pointer;
+		z-index: 2;
+		transition: filter 0.2s;
+
+		-webkit-backface-visibility: hidden;
+		backface-visibility: hidden;
+		transform-style: preserve-3d;
+		image-rendering: auto;
+
+		animation: star-pulse 3s ease-in-out infinite;
+		animation-delay: var(--pulse-delay, 0s);
+	}
+
+	.star:hover {
+		filter: brightness(1.4);
+		animation-play-state: paused;
+	}
+
+	.star:hover::before {
+		width: calc(var(--beam-len) * 2.5);
+	}
+
+	.star:hover::after {
+		height: calc(var(--beam-len) * 2.5);
+	}
+
+	.star:hover .star-tooltip {
+		opacity: 1;
+		transform: translateX(-50%) translateY(0);
+	}
+
+	.star::before {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: var(--beam-len);
+		height: var(--beam-w);
+		transition:
+			width 0.3s ease,
+			height 0.3s ease;
+		background: linear-gradient(
+			90deg,
+			transparent 0%,
+			color-mix(in srgb, var(--color) 15%, transparent) 20%,
+			color-mix(in srgb, var(--color) 50%, transparent) 40%,
+			#fff 50%,
+			color-mix(in srgb, var(--color) 50%, transparent) 60%,
+			color-mix(in srgb, var(--color) 15%, transparent) 80%,
+			transparent 100%
+		);
+		pointer-events: none;
+	}
+
+	.star::after {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		height: var(--beam-len);
+		width: var(--beam-w);
+		transition:
+			width 0.3s ease,
+			height 0.3s ease;
+		background: linear-gradient(
+			180deg,
+			transparent 0%,
+			color-mix(in srgb, var(--color) 15%, transparent) 20%,
+			color-mix(in srgb, var(--color) 50%, transparent) 40%,
+			#fff 50%,
+			color-mix(in srgb, var(--color) 50%, transparent) 60%,
+			color-mix(in srgb, var(--color) 15%, transparent) 80%,
+			transparent 100%
+		);
+		pointer-events: none;
+	}
+
+	@keyframes star-pulse {
+		0%,
+		100% {
+			opacity: var(--glow);
+		}
+		50% {
+			opacity: calc(var(--glow) * 0.8);
+		}
+	}
+</style>

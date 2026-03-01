@@ -1,1 +1,8 @@
 @import "tailwindcss";
+
+@theme {
+	--color-sky-dark: #080c18;
+	--color-modal-bg: rgba(10, 14, 28, 0.96);
+	--color-backdrop: rgba(0, 0, 0, 0.55);
+}
+
