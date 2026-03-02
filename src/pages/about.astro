@@ -1,0 +1,44 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Star from "@components/Star.astro";
+import Sky from "@components/Sky.astro";
+import { generateStaticStars } from "@utils/generateStaticStars";
+
+const seeds = [1003, 2507, 3714, 4221, 5831, 6148, 7362, 8917, 9543, 10284];
+const stars = generateStaticStars(seeds);
+---
+
+<Layout>
+	<main class="flex h-screen flex-col gap-15">
+		<div class="relative w-full flex-1">
+			<Sky star_intensity="50" />
+			{
+				stars.map((s) => (
+					<div class="absolute" style={`left:${s.x}%;top:${s.y}%;`}>
+						<Star
+							color={s.color}
+							size={s.size}
+							glow={s.glow}
+							beamLen={s.beamLen}
+							beamW={s.beamW}
+							pulseDelay={s.pulseDelay}
+						/>
+					</div>
+				))
+			}
+		</div>
+		<div class="shrink-0 lg:px-40">
+			<p class="mb-6 text-3xl font-medium text-white">Still, They Shine</p>
+			<div class="text-gray-400">
+				<p>
+					Inspired by Spiritfarer and Outer Wilds, this site is a quiet space to
+					remember the companions who have traveled onward. <br />Here, you can
+					share a memory of a pet who has passed away, and they will be
+					appointed to a real star in the night sky. It is a simple, way to
+					honor their journey, keeping their light shining above us so they are
+					never truly gone.
+				</p>
+			</div>
+		</div>
+	</main>
+</Layout>

@@ -1,16 +1,11 @@
 ---
 import { createClient } from "@libsql/client";
-// prettier-ignore
-import { getRandomStar, setChromaticity, setSize, setLuminosity } from "@utils/star";
-import { setPosition } from "@utils/positioning";
-import { hashSeed, seededRandom } from "@utils/random";
-
-import Layout from "../layouts/Layout.astro";
-
-import Star from "../components/Star.astro";
-import BackgroundStars from "../components/BackgroundStars.astro";
-import Nebula from "../components/Nebula.astro";
-
+import { setPosition } from "@utils/setPosition";
+import { hashSeed } from "@utils/random";
+import renderStar from "@utils/renderStar";
+import Layout from "@layouts/Layout.astro";
+import Star from "@components/Star.astro";
+import Sky from "@components/Sky.astro";
 import starCatalog from "../data/star-catalog.json";
 
 const turso = createClient({
@@ -23,37 +18,25 @@ const starByHR = Object.fromEntries(starCatalog.map((s) => [s.HR, s]));
 
 const stars = entries.rows
 	.map((row) => {
-		const star = starByHR[row.star_hr as string];
-		if (!star) return null;
+		const starData = starByHR[row.star_hr as string];
+		if (!starData) return null;
 
-		const vmag = parseFloat(star.Vmag) || 3;
-		const color = setChromaticity(star["Sp Type"]);
-		const size = setSize(vmag);
-		const glow = setLuminosity(vmag);
-		const beamLen = size * 5;
-		const beamW = Math.max(1.5, size * 0.18);
+		const visual = renderStar(starData, row);
+		if (!visual) return null;
 
 		const seed = hashSeed(
 			`${row.star_hr}-${row.name}-${row.birth_year}-${row.death_year}`,
 		);
 		const pos = setPosition(seed);
-		const pulseDelay = (seededRandom(seed + 999) * 3).toFixed(2);
-
-		const starLabel = star.Name ? star.Name : `HR ${row.star_hr}`;
 
 		return {
-			color,
-			size,
-			glow,
-			beamLen,
-			beamW,
+			...visual,
 			x: 35 + pos.x * 0.3,
 			y: 35 + pos.y * 0.3,
-			pulseDelay,
-			name: row.name as string,
-			birthYear: row.birth_year as string,
-			deathYear: row.death_year as string,
-			starLabel,
+			starName: starData?.Name || starData?.ID,
+			name: row.name,
+			birthYear: row.birth_year,
+			deathYear: row.death_year,
 		};
 	})
 	.filter((s): s is NonNullable<typeof s> => s !== null);
@@ -61,42 +44,70 @@ const stars = entries.rows
 
 <Layout>
 	<div id="viewport" class="bg-sky-dark fixed inset-0 z-10 overflow-hidden">
-		<div id="canvas" class="absolute h-[500vh] w-[500vw] origin-center">
-			<BackgroundStars />
-			<Nebula />
-			{stars.map((s) => <Star {...s} />)}
+		<div id="canvas" class="absolute h-[375vmax] w-[375vmax] origin-center">
+			<Sky star_intensity="4000" />
+			{
+				stars.map((s) => (
+					<div
+						class="absolute flex flex-col items-center"
+						style={`left:${s.x}%;top:${s.y}%;transform:translate(-50%,-50%);`}
+					>
+						<div class="peer">
+							<Star
+								color={s.color}
+								size={s.size}
+								glow={s.glow}
+								beamLen={s.beamLen}
+								beamW={s.beamW}
+								pulseDelay={s.pulseDelay}
+							/>
+						</div>
+
+						<div class="pointer-events-none mt-2 text-center text-[0.6rem] leading-snug whitespace-nowrap opacity-0 transition-opacity peer-hover:opacity-100">
+							<p class="text-[0.5rem] text-white/50">{s.starName}</p>
+							<p class="font-medium" style={`color:${s.color};`}>
+								{s.name}
+							</p>
+							<p class="text-white/40">
+								{s.birthYear} – {s.deathYear}
+							</p>
+						</div>
+					</div>
+				))
+			}
 		</div>
 	</div>
-
-	<div class="pointer-events-none fixed inset-0 z-100">
-		<div class="flex justify-center p-10" 2>
+	<div class="pointer-events-none fixed inset-0 z-50 flex h-full flex-col p-10">
+		<div space-y-2>
 			<a
-				href="/"
+				href="about"
 				class="pointer-events-auto cursor-pointer text-lg tracking-[5px] uppercase"
 			>
-				Still, We Shine
+				Still, They Shine
 			</a>
+			<p class="text-xs opacity-50">{stars.length} companions in the sky</p>
 		</div>
 	</div>
-	<script>
-		import Panzoom from "@panzoom/panzoom";
-
-		const canvas = document.getElementById("canvas")!;
-		const viewport = document.getElementById("viewport")!;
-
-		const panzoom = Panzoom(canvas, {
-			maxScale: 10,
-			minScale: 0.2,
-			contain: "outside",
-			canvas: true,
-			cursor: "arrow",
-			startScale: 1,
-			startX: -(canvas.offsetWidth - window.innerWidth) / 2,
-			startY: -(canvas.offsetHeight - window.innerHeight) / 2,
-		});
-
-		viewport.addEventListener("wheel", panzoom.zoomWithWheel, {
-			passive: false,
-		});
-	</script>
 </Layout>
+
+<script>
+	import Panzoom from "@panzoom/panzoom";
+
+	const canvas = document.getElementById("canvas")!;
+	const viewport = document.getElementById("viewport")!;
+
+	const panzoom = Panzoom(canvas, {
+		maxScale: 10,
+		minScale: 0.2,
+		contain: "outside",
+		canvas: true,
+		cursor: "arrow",
+		startScale: 1,
+		startX: -(canvas.offsetWidth - window.innerWidth) / 2,
+		startY: -(canvas.offsetHeight - window.innerHeight) / 2,
+	});
+
+	viewport.addEventListener("wheel", panzoom.zoomWithWheel, {
+		passive: false,
+	});
+</script>

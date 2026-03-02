@@ -6,3 +6,20 @@
 	--color-backdrop: rgba(0, 0, 0, 0.55);
 }
 
+@font-face {
+	font-family: "Outfit";
+	src:
+		url("/fonts/outfit/Outfit-VariableFont.woff2") format("woff2"),
+		url("/fonts/outfit/Outfit-VariableFont.woff") format("woff");
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+}
+
+body {
+	@apply bg-sky-dark text-gray-300 font-['Outfit'];
+}
+
+main {
+	@apply px-5 py-20 md:px-20 lg:px-30;
+}
