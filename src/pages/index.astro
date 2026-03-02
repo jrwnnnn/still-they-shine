@@ -2,16 +2,42 @@
 import { createClient } from "@libsql/client";
 import { setPosition } from "@utils/setPosition";
 import { hashSeed } from "@utils/random";
+import { getRandomStar } from "@utils/star";
 import renderStar from "@utils/renderStar";
 import Layout from "@layouts/Layout.astro";
 import Star from "@components/Star.astro";
 import Sky from "@components/Sky.astro";
+import Form from "@components/Form.astro";
 import starCatalog from "../data/star-catalog.json";
 
 const turso = createClient({
 	url: import.meta.env.TURSO_DATABASE_URL,
 	authToken: import.meta.env.TURSO_AUTH_TOKEN,
 });
+
+let error = "";
+
+if (Astro.request.method === "POST") {
+	const formData = await Astro.request.formData();
+	const name = (formData.get("name") as string)?.trim();
+	const birthYear = (formData.get("birth_year") as string)?.trim();
+	const deathYear = (formData.get("death_year") as string)?.trim();
+	const star = getRandomStar();
+
+	if (!name) {
+		error = "Please enter a name.";
+	} else if (!birthYear || !deathYear) {
+		error = "Please enter both birth and death year.";
+	} else if (parseInt(birthYear) > parseInt(deathYear)) {
+		error = "Birth year must be before death year.";
+	} else {
+		await turso.execute(
+			"INSERT INTO stars (star_hr, name, birth_year, death_year) VALUES (?, ?, ?, ?)",
+			[star.HR, name, birthYear, deathYear],
+		);
+		return Astro.redirect("/");
+	}
+}
 
 const entries = await turso.execute("SELECT * FROM stars");
 const starByHR = Object.fromEntries(starCatalog.map((s) => [s.HR, s]));
@@ -42,8 +68,15 @@ const stars = entries.rows
 	.filter((s): s is NonNullable<typeof s> => s !== null);
 ---
 
+<!-- TODO: 
+- Form to submit new stars, which adds to the database and generates a new star on the sky. 
+- A page to view individual star data
+- A function to zoom to a specific star by database ID.
+- Add an optional background music.
+- Constellations?
+- Refactor: Convert the viewport to canvas. -->
 <Layout>
-	<div id="viewport" class="bg-sky-dark fixed inset-0 z-10 overflow-hidden">
+	<div id="viewport" class="bg-sky-dark fixed inset-0 overflow-hidden">
 		<div id="canvas" class="absolute h-[375vmax] w-[375vmax] origin-center">
 			<Sky star_intensity="4000" />
 			{
@@ -63,9 +96,9 @@ const stars = entries.rows
 							/>
 						</div>
 
-						<div class="pointer-events-none mt-2 text-center text-[0.6rem] leading-snug whitespace-nowrap opacity-0 transition-opacity peer-hover:opacity-100">
-							<p class="text-[0.5rem] text-white/50">{s.starName}</p>
-							<p class="font-medium" style={`color:${s.color};`}>
+						<div class="pointer-events-none z-25 mt-2 text-center text-[0.8rem] leading-snug whitespace-nowrap opacity-0 transition-opacity peer-hover:opacity-100">
+							<p class="text-white/50">{s.starName}</p>
+							<p class="text-sm! font-medium" style={`color:${s.color};`}>
 								{s.name}
 							</p>
 							<p class="text-white/40">
@@ -77,15 +110,72 @@ const stars = entries.rows
 			}
 		</div>
 	</div>
-	<div class="pointer-events-none fixed inset-0 z-50 flex h-full flex-col p-10">
+	<div
+		class="pointer-events-none fixed inset-0 z-50 flex h-full flex-col justify-between p-10"
+	>
 		<div space-y-2>
 			<a
 				href="about"
-				class="pointer-events-auto cursor-pointer text-lg tracking-[5px] font-bold uppercase"
+				class="pointer-events-auto cursor-pointer text-xl font-bold tracking-[5px] uppercase"
 			>
 				Still, They Shine
 			</a>
 			<p class="text-xs opacity-50">{stars.length} companions in the sky</p>
+		</div>
+
+		<button
+			id="openBtn"
+			class="pointer-events-auto cursor-pointer self-end rounded-full bg-white/5 px-4 py-2 text-white hover:bg-white/10"
+		>
+			<span class="mr-1.25">✦</span>Place a Star
+		</button>
+	</div>
+	<div
+		id="formModal"
+		class="fixed inset-0 z-100 hidden h-full items-center justify-center backdrop-blur-sm"
+	>
+		<div
+			class="mx-5 flex max-w-md flex-col space-y-6 rounded-2xl bg-sky-dark/70 p-8 shadow-xl shadow-black/30 backdrop-blur-md"
+		>
+			<div>
+				<div class="mb-4 flex justify-between">
+					<p
+						class="text-xl text-indigo-200/50 [text-shadow:0_0_12px_rgba(199,210,254,0.4)]"
+					>
+						✦
+					</p>
+					<button
+						id="exitBtn"
+						class="cursor-pointer text-2xl text-white/40 transition hover:text-white"
+					>
+						&times;
+					</button>
+				</div>
+				<h1 class="mb-2 text-2xl font-medium tracking-tight text-white">
+					Place a Star
+				</h1>
+				<p class="text-sm leading-relaxed text-white/45">
+					Dedicate a star in the sky to a companion you want to remember.
+				</p>
+			</div>
+
+			{
+				error && (
+					<div class="flex gap-3 rounded-xl border border-red-400/15 bg-red-500/8 px-4 py-3 text-sm text-red-300/90">
+						<span class="mt-px shrink-0 text-red-400/70">⚠</span>
+						<span>{error}</span>
+					</div>
+				)
+			}
+
+			<Form />
+
+			<a
+				href="/"
+				class="self-center text-xs tracking-wider text-white/40 hover:underline"
+			>
+				Privacy Policy
+			</a>
 		</div>
 	</div>
 </Layout>
@@ -109,5 +199,21 @@ const stars = entries.rows
 
 	viewport.addEventListener("wheel", panzoom.zoomWithWheel, {
 		passive: false,
+	});
+
+	const formModal = document.getElementById("formModal")!;
+	const openBtn = document.getElementById("openBtn")!;
+	const closeBtn = document.getElementById("exitBtn")!;
+
+	openBtn.addEventListener("click", () => {
+		formModal.classList.remove("hidden");
+		formModal.classList.add("flex");
+		openBtn.setAttribute("disabled", "");
+	});
+
+	closeBtn.addEventListener("click", () => {
+		formModal.classList.add("hidden");
+		formModal.classList.remove("flex");
+		openBtn.removeAttribute("disabled");
 	});
 </script>
