@@ -9,8 +9,8 @@ const stars = generateStaticStars(seeds);
 ---
 
 <Layout>
-	<main class="flex h-screen flex-col gap-15">
-		<div class="relative w-full flex-1">
+	<main>
+		<div class="relative mb-15 h-[50vh] w-full">
 			<Sky star_intensity="50" />
 			{
 				stars.map((s) => (
@@ -27,17 +27,50 @@ const stars = generateStaticStars(seeds);
 				))
 			}
 		</div>
-		<div class="shrink-0 lg:px-40">
-			<p class="mb-6 text-3xl font-medium text-white">Still, They Shine</p>
-			<div class="text-gray-400">
-				<p>
-					Inspired by Spiritfarer and Outer Wilds, this site is a quiet space to
-					remember the companions who have traveled onward. <br />Here, you can
-					share a memory of a pet who has passed away, and they will be
-					appointed to a real star in the night sky. It is a simple, way to
-					honor their journey, keeping their light shining above us so they are
-					never truly gone.
-				</p>
+		<div class="lg:px-40">
+			<div class="mb-10">
+				<p class="mb-6 text-3xl font-medium text-white">Still, They Shine</p>
+				<div class="text-gray-400">
+					<p>
+						Inspired by Spiritfarer and Outer Wilds, this site is a quiet space
+						to remember the companions who have traveled onward. <br />Here, you
+						can share a memory of a pet who has passed away, and they will be
+						appointed to a real star in the night sky. It is a simple, way to
+						honor their journey, keeping their light shining above us so they
+						are never truly gone.
+					</p>
+				</div>
+			</div>
+			<div class="flex items-end justify-between">
+				<div class="flex items-center gap-5">
+					<a
+						href="https://github.com/jrwnnnn/graveyard-of-stars"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="hover:underline"
+					>
+						<img
+							class="h-6 object-contain invert"
+							src="/icons/github.svg"
+							loading="lazy"
+							alt="GitHub Icon"
+						/>
+					</a>
+					<a
+						href="https://jrwnnnn.me"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="hover:underline"
+					>
+						<img
+							class="h-7 object-contain"
+							src="/icons/jrwnnnn.svg"
+							loading="lazy"
+							alt="Website Icon"
+						/>
+					</a>
+				</div>
+				<a href="/" class="text-sm hover:underline italic"> Privacy Policy </a>
 			</div>
 		</div>
 	</main>
