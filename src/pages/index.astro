@@ -70,19 +70,21 @@ const stars = entries.rows
 ---
 
 <!-- TODO: 
-- Form to submit new stars, which adds to the database and generates a new star on the sky. 
-- A page to view individual star data
 - A function to zoom to a specific star by database ID.
 - Add an optional background music.
 - Constellations?
 - Refactor: Convert the viewport to canvas. -->
 <Layout>
 	<div id="viewport" class="bg-sky-dark fixed inset-0 overflow-hidden">
-		<div id="canvas" class="absolute h-[375vmax] w-[375vmax] origin-center">
-			<Sky star_intensity="4000" />
+		<div
+			id="canvas"
+			class="absolute h-[375vmax] w-[375vmax] origin-center md:h-[187.5vmax]"
+		>
+			<Sky star_intensity="1000" meteor_count="5" />
 			{
 				stars.map((s) => (
-					<div
+					<a
+						href={`/star/${s.id}`}
 						class="absolute flex flex-col items-center"
 						style={`left:${s.x}%;top:${s.y}%;transform:translate(-50%,-50%);`}
 					>
@@ -94,6 +96,8 @@ const stars = entries.rows
 								beamLen={s.beamLen}
 								beamW={s.beamW}
 								pulseDelay={s.pulseDelay}
+								animateIn={true}
+								animateDelay={true}
 							/>
 						</div>
 
@@ -106,13 +110,13 @@ const stars = entries.rows
 								{s.birthYear} – {s.deathYear}
 							</p>
 						</div>
-					</div>
+					</a>
 				))
 			}
 		</div>
 	</div>
 	<div
-		class="pointer-events-none fixed inset-0 z-50 flex h-full flex-col justify-between p-10"
+		class="pointer-events-none fixed inset-0 z-50 flex h-full flex-col justify-between p-5"
 	>
 		<div space-y-2>
 			<a
@@ -123,16 +127,20 @@ const stars = entries.rows
 			</a>
 			<p class="text-xs opacity-50">♫ The Museum - Andrew Prahlow</p>
 		</div>
-		<div class="self-end">
-			<audio id="ambient" autoplay loop>
-				<source
-					src="sounds/The Museum - Andrew Prahlow.mp3"
-					type="audio/mpeg"
+		<div
+			class="flex flex-col items-end gap-2 self-end md:flex-row md:items-center"
+		>
+			<button
+				onclick="document.getElementById('ambient').muted = !document.getElementById('ambient').muted"
+				class="pointer-events-auto cursor-pointer rounded-full bg-white/5 px-4 py-2 text-white hover:bg-white/10"
+			>
+				<img
+					class="h-5 object-contain invert"
+					src="/icons/sound.svg"
+					loading="lazy"
+					alt="GitHub Icon"
 				/>
-			</audio>
-			<script>
-				(document.getElementById("ambient") as HTMLAudioElement).volume = 0.2;
-			</script>
+			</button>
 			<button
 				id="openBtn"
 				class="pointer-events-auto cursor-pointer rounded-full bg-white/5 px-4 py-2 text-white hover:bg-white/10"
@@ -146,7 +154,11 @@ const stars = entries.rows
 	id="formModal"
 	class="fixed inset-0 z-100 hidden h-full w-full items-center justify-center p-5"
 >
-	<div id="formBackdrop" class="fixed inset-0 backdrop-blur-sm pointer-events-auto"></div>
+	<div
+		id="formBackdrop"
+		class="pointer-events-auto fixed inset-0 backdrop-blur-sm"
+	>
+	</div>
 	<div
 		class="bg-sky-dark/70 flex w-full flex-col space-y-6 rounded-2xl p-8 shadow-xl shadow-black/30 backdrop-blur-md md:max-w-md"
 	>
@@ -192,6 +204,11 @@ const stars = entries.rows
 	</div>
 </div>
 
+<audio id="ambient" loop>
+	<source src="sounds/The Museum - Andrew Prahlow.mp3" type="audio/mpeg" />
+</audio>
+
+<script src="../utils/ambientSound.ts"></script>
 <script>
 	import Panzoom from "@panzoom/panzoom";
 	import { focusStar } from "@utils/focusStar";
@@ -233,7 +250,7 @@ const stars = entries.rows
 		}
 	}
 
-	[openBtn, closeBtn, formBackdrop].forEach(el => {
+	[openBtn, closeBtn, formBackdrop].forEach((el) => {
 		el.addEventListener("click", toggleForm);
 	});
 </script>

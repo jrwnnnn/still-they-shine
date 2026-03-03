@@ -20,8 +20,8 @@ export function focusStar(panzoom: PanzoomObject, starId: string | number) {
 
 	panzoom.setOptions({ contain: undefined });
 
-	panzoom.zoom(scale, { animate: true, duration: 500 });
-	panzoom.pan(panX, panY, { animate: true, duration: 500, force: true });
+	panzoom.zoom(scale, { animate: true, duration: 20000 });
+	panzoom.pan(panX, panY, { animate: true, duration: 20000, force: true });
 
 	setTimeout(() => {
 		panzoom.setOptions({ contain: "outside" });

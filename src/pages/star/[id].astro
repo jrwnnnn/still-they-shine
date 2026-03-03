@@ -1,0 +1,176 @@
+---
+import { createClient } from "@libsql/client";
+import renderStar from "@utils/renderStar";
+import { generateStaticStars } from "@utils/generateStaticStars";
+import Layout from "@layouts/Layout.astro";
+import Star from "@components/Star.astro";
+import Sky from "@components/Sky.astro";
+import starCatalog from "../../data/star-catalog.json";
+import constellations from "../../data/constellations.json";
+
+const turso = createClient({
+	url: import.meta.env.TURSO_DATABASE_URL,
+	authToken: import.meta.env.TURSO_AUTH_TOKEN,
+});
+
+const id = Astro.params.id as string;
+const entries = await turso.execute("SELECT * FROM stars WHERE id = ?", [id]);
+
+if (!entries.rows.length) {
+	return Astro.redirect("/");
+}
+
+const row = entries.rows[0];
+const starByHR = Object.fromEntries(starCatalog.map((s) => [s.HR, s]));
+const starData = starByHR[row.star_hr as string];
+const visual = renderStar(starData, row);
+const color = visual?.color ?? "#ffffff";
+const starName = starData?.Name || starData?.ID;
+const constellation =
+	constellations[starData.Con as keyof typeof constellations];
+const spectralType = starData?.["Sp Type"] || "—";
+const distance = starData?.Distance ? `${starData.Distance} ly` : "Unknown";
+
+const seeds = [1003, 2507, 3714, 4221, 5832, 6947, 8123, 9456];
+const stars = generateStaticStars(seeds);
+---
+
+<Layout>
+	<div class="fixed inset-0 overflow-hidden">
+		<Sky star_intensity="100" nebula={false} />
+		{
+			stars.map((s) => (
+				<div class="absolute scale-[0.3]" style={`left:${s.x}%;top:${s.y}%;`}>
+					<Star
+						color={s.color}
+						size={s.size}
+						glow={s.glow}
+						beamLen={s.beamLen}
+						beamW={s.beamW}
+						pulseDelay={s.pulseDelay}
+						animateIn={true}
+						animateDelay={true}
+					/>
+				</div>
+			))
+		}
+
+		<img
+			src={row.photo_url as string}
+			alt={`Photo of ${row.name}`}
+			class="animate-fade-in h-full w-full object-cover opacity-0 grayscale"
+			style="-webkit-mask-image: radial-gradient(circle, black 30%, transparent 80%); mask-image: radial-gradient(circle, black 30%, transparent 80%); transition: opacity 2s;"
+			oncontextmenu="return false;"
+			onload="this.style.opacity=0.04"
+		/>
+		<style>
+			@keyframes fade-in {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 0.06;
+				}
+			}
+			.animate-fade-in {
+				animation: fade-in 2s ease forwards;
+			}
+		</style>
+	</div>
+
+	<main class="relative z-10 min-h-screen p-5">
+		<div class="relative flex h-[40vh] items-center justify-center">
+			<div
+				class="absolute h-44 w-44 rounded-full opacity-20 blur-3xl"
+				style={`background: radial-gradient(circle, ${color}, transparent 70%);`}
+			>
+			</div>
+			{
+				visual && (
+					<div class="scale-[2.2]">
+						<Star
+							color={visual.color}
+							size={visual.size}
+							glow={visual.glow}
+							beamLen={visual.beamLen}
+							beamW={visual.beamW}
+							pulseDelay={visual.pulseDelay}
+							animateIn={true}
+							animateDelay={false}
+						/>
+					</div>
+				)
+			}
+		</div>
+		<div class="mx-auto flex max-w-2xl flex-col items-center space-y-6">
+			<div class="space-y-2 text-center">
+				<h1
+					class="text-4xl font-semibold tracking-tight text-white md:text-5xl"
+				>
+					{row.name}
+				</h1>
+				<p class="text-lg text-white/40">
+					{row.birth_year} – {row.death_year}
+				</p>
+				<p class="mt-5 text-left text-balance text-white/80">
+					{row.message ?? null}
+				</p>
+			</div>
+
+			<div
+				class="w-full rounded-2xl border border-white/6 bg-white/3 p-6 backdrop-blur-md"
+			>
+				<p
+					class="mb-4 text-xs font-medium tracking-widest text-white/30 uppercase"
+				>
+					Star Details
+				</p>
+				<div class="space-y-3">
+					<div class="flex items-center justify-between">
+						<span class="text-sm text-white/40">Star</span>
+						<span class="text-sm font-medium" style={`color: ${color};`}
+							>{starName}</span
+						>
+					</div>
+					<div class="h-px w-full bg-white/5"></div>
+					<div class="flex items-center justify-between">
+						<span class="text-sm text-white/40">Constellation</span>
+						<span class="text-sm text-white/70">{constellation}</span>
+					</div>
+					<div class="h-px w-full bg-white/5"></div>
+					<div class="flex items-center justify-between">
+						<span class="text-sm text-white/40">Spectral Type</span>
+						<span class="text-sm text-white/70">{spectralType}</span>
+					</div>
+					<div class="h-px w-full bg-white/5"></div>
+					<div class="flex items-center justify-between">
+						<span class="text-sm text-white/40">Distance</span>
+						<span class="text-sm text-white/70">{distance}</span>
+					</div>
+				</div>
+			</div>
+			<a
+				href="https://github.com/jrwnnnn/graveyard-of-stars"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="flex items-center opacity-50 hover:opacity-80 transition"
+			>
+				<img
+					class="h-5 object-contain invert"
+					src="/icons/report_flag.svg"
+					loading="lazy"
+					alt="GitHub Icon"
+				/>
+				<span class="ml-2">Report an issue</span>
+			</a>
+		</div>
+	</main>
+	<audio id="ambient" loop>
+		<source
+			src="/sounds/Stellas Departure - Max LL.mp3"
+			type="audio/mpeg"
+		/>
+	</audio>
+</Layout>
+
+<script src="../../utils/ambientSound.ts"></script>
