@@ -1,11 +1,11 @@
-<h1 align="center">Project Name</h1>
+<h1 align="center">Still, They Shine</h1>
 
 <p align="center"><i>Quick one-liner about what this project does.</i></p>
 
 <div align="center">
    <!-- FIND PREMADE BADGES HERE: https://github.com/Ileriayo/markdown-badges -->
    <a href="https://opensource.org/license/mit"><img src="https://img.shields.io/badge/MIT-green?style=for-the-badge"></a>
-   <a href="https://github.com/jrwnnnn/scaffold"><img src="https://img.shields.io/github/stars/jrwnnnn/scaffold?style=for-the-badge"></a>
+   <a href="https://github.com/jrwnnnn/still-they-shine"><img src="https://img.shields.io/github/stars/jrwnnnn/still-they-shine?style=for-the-badge"></a>
 </div>
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
@@ -20,7 +20,7 @@ Make sure the following are installed:
 
 ```bash
 #Clone the repository
-git clone https://github.com/jrwnnnn/scaffold.git
+git clone https://github.com/jrwnnnn/still-they-shine.git
 cd scaffold
 
 #Install the required dependencies
@@ -43,8 +43,8 @@ The above copyright notice and this permission notice shall be included in all c
 
 ## Contributors
 
-<a href="https://github.com/jrwnnnn/scaffold/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=jrwnnnn/scaffold" />
+<a href="https://github.com/jrwnnnn/still-they-shine/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=jrwnnnn/still-they-shine" />
 </a>
 
 <br>
