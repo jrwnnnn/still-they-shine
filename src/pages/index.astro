@@ -56,6 +56,7 @@ const stars = entries.rows
 		const pos = setPosition(seed);
 
 		return {
+			id: row.id,
 			...visual,
 			x: 35 + pos.x * 0.3,
 			y: 35 + pos.y * 0.3,
@@ -85,7 +86,7 @@ const stars = entries.rows
 						class="absolute flex flex-col items-center"
 						style={`left:${s.x}%;top:${s.y}%;transform:translate(-50%,-50%);`}
 					>
-						<div class="peer">
+						<div class="peer" id={s.id as string}>
 							<Star
 								color={s.color}
 								size={s.size}
@@ -96,7 +97,7 @@ const stars = entries.rows
 							/>
 						</div>
 
-						<div class="pointer-events-none z-25 mt-2 text-center text-[0.8rem] leading-snug whitespace-nowrap opacity-0 transition-opacity peer-hover:opacity-100">
+						<div class="focused:opacity-100 pointer-events-none z-25 mt-2 text-center text-[0.8rem] leading-snug whitespace-nowrap opacity-0 transition-opacity peer-hover:opacity-100">
 							<p class="text-white/50">{s.starName}</p>
 							<p class="text-sm! font-medium" style={`color:${s.color};`}>
 								{s.name}
@@ -120,7 +121,7 @@ const stars = entries.rows
 			>
 				Still, They Shine
 			</a>
-			<p class="text-xs opacity-50">{stars.length} companions in the sky</p>
+			<p class="text-xs opacity-50">♫ The Museum - Andrew Prahlow</p>
 		</div>
 		<div class="self-end">
 			<audio id="ambient" autoplay loop>
@@ -140,58 +141,62 @@ const stars = entries.rows
 			</button>
 		</div>
 	</div>
-	<div
-		id="formModal"
-		class="fixed inset-0 z-100 hidden h-full items-center justify-center backdrop-blur-sm"
-	>
-		<div
-			class="bg-sky-dark/70 mx-5 flex max-w-md flex-col space-y-6 rounded-2xl p-8 shadow-xl shadow-black/30 backdrop-blur-md"
-		>
-			<div>
-				<div class="mb-4 flex justify-between">
-					<p
-						class="text-xl text-indigo-200/50 [text-shadow:0_0_12px_rgba(199,210,254,0.4)]"
-					>
-						✦
-					</p>
-					<button
-						id="exitBtn"
-						class="cursor-pointer text-2xl text-white/40 transition hover:text-white"
-					>
-						&times;
-					</button>
-				</div>
-				<h1 class="mb-2 text-2xl font-medium tracking-tight text-white">
-					Place a Star
-				</h1>
-				<p class="text-sm leading-relaxed text-white/45">
-					Dedicate a star in the sky to a companion you want to remember.
-				</p>
-			</div>
-
-			{
-				error && (
-					<div class="flex gap-3 rounded-xl border border-red-400/15 bg-red-500/8 px-4 py-3 text-sm text-red-300/90">
-						<span class="mt-px shrink-0 text-red-400/70">⚠</span>
-						<span>{error}</span>
-					</div>
-				)
-			}
-
-			<Form />
-
-			<a
-				href="/"
-				class="self-center text-xs tracking-wider text-white/40 hover:underline"
-			>
-				Privacy Policy
-			</a>
-		</div>
-	</div>
 </Layout>
+<div
+	id="formModal"
+	class="fixed inset-0 z-100 hidden h-full w-full items-center justify-center p-5"
+>
+	<div id="formBackdrop" class="fixed inset-0 backdrop-blur-sm pointer-events-auto"></div>
+	<div
+		class="bg-sky-dark/70 flex w-full flex-col space-y-6 rounded-2xl p-8 shadow-xl shadow-black/30 backdrop-blur-md md:max-w-md"
+	>
+		<div>
+			<div class="mb-4 flex justify-between">
+				<p
+					class="text-xl text-indigo-200/50 [text-shadow:0_0_12px_rgba(199,210,254,0.4)]"
+				>
+					✦
+				</p>
+				<button
+					id="exitBtn"
+					class="cursor-pointer text-2xl text-white/40 transition hover:text-white"
+				>
+					&times;
+				</button>
+			</div>
+			<h1 class="mb-2 text-2xl font-medium tracking-tight text-white">
+				Place a Star
+			</h1>
+			<p class="text-sm leading-relaxed text-white/45">
+				Dedicate a star in the sky to a companion you want to remember.
+			</p>
+		</div>
+
+		{
+			error && (
+				<div class="flex gap-3 rounded-xl border border-red-400/15 bg-red-500/8 px-4 py-3 text-sm text-red-300/90">
+					<span class="mt-px shrink-0 text-red-400/70">⚠</span>
+					<span>{error}</span>
+				</div>
+			)
+		}
+
+		<Form />
+
+		<a
+			href="/"
+			class="self-center text-xs tracking-wider text-white/40 hover:underline"
+		>
+			Privacy Policy
+		</a>
+	</div>
+</div>
 
 <script>
 	import Panzoom from "@panzoom/panzoom";
+	import { focusStar } from "@utils/focusStar";
+
+	(window as any).focusStar = (id: string | number) => focusStar(panzoom, id);
 
 	const canvas = document.getElementById("canvas")!;
 	const viewport = document.getElementById("viewport")!;
@@ -212,18 +217,23 @@ const stars = entries.rows
 	});
 
 	const formModal = document.getElementById("formModal")!;
+	const formBackdrop = document.getElementById("formBackdrop")!;
 	const openBtn = document.getElementById("openBtn")!;
 	const closeBtn = document.getElementById("exitBtn")!;
 
-	openBtn.addEventListener("click", () => {
-		formModal.classList.remove("hidden");
-		formModal.classList.add("flex");
-		openBtn.setAttribute("disabled", "");
-	});
+	function toggleForm() {
+		if (formModal.classList.contains("hidden")) {
+			formModal.classList.remove("hidden");
+			formModal.classList.add("flex");
+			openBtn.setAttribute("disabled", "");
+		} else {
+			formModal.classList.add("hidden");
+			formModal.classList.remove("flex");
+			openBtn.removeAttribute("disabled");
+		}
+	}
 
-	closeBtn.addEventListener("click", () => {
-		formModal.classList.add("hidden");
-		formModal.classList.remove("flex");
-		openBtn.removeAttribute("disabled");
+	[openBtn, closeBtn, formBackdrop].forEach(el => {
+		el.addEventListener("click", toggleForm);
 	});
 </script>
