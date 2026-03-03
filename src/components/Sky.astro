@@ -93,8 +93,8 @@ const bgMeteors = Array.from({ length: meteor_count }, (_, i) => {
     }
 
     @keyframes meteor {
-        0% { transform: translate(0, 0) rotate(60deg); opacity: 1; }
-        20% { transform: translate(-50vw, 50vh) rotate(60deg); opacity: 0; }
+        0% { transform: rotate(60deg) translateY(0); opacity: 1; }
+        20% { transform: rotate(60deg) translateY(100vmax); opacity: 0; }
         100% { opacity: 0; }
     }
 </style>

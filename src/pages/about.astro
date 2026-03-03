@@ -11,7 +11,7 @@ const stars = generateStaticStars(seeds);
 <Layout>
 	<main>
 		<div class="relative mb-15 h-[50vh] w-full">
-			<Sky star_intensity="50" />
+			<Sky star_intensity="50" meteor_count="0"/>
 			{
 				stars.map((s) => (
 					<div class="absolute" style={`left:${s.x}%;top:${s.y}%;`}>

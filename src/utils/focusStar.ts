@@ -1,13 +1,11 @@
-// !FIX Buggy zoom
-
 import type { PanzoomObject } from "@panzoom/panzoom";
 
 export function focusStar(panzoom: PanzoomObject, starId: string | number) {
 	const wrapper = document.getElementById(String(starId))?.parentElement;
 	if (!wrapper) return;
 
-	const scale = 1;
 	const canvas = wrapper.parentElement!;
+	const scale = 1;
 
 	const panX =
 		(window.innerWidth / 2 - canvas.offsetWidth / 2) / scale -
@@ -19,11 +17,7 @@ export function focusStar(panzoom: PanzoomObject, starId: string | number) {
 		canvas.offsetHeight / 2;
 
 	panzoom.setOptions({ contain: undefined });
-
-	panzoom.zoom(scale, { animate: true, duration: 20000 });
-	panzoom.pan(panX, panY, { animate: true, duration: 20000, force: true });
-
-	setTimeout(() => {
-		panzoom.setOptions({ contain: "outside" });
-	}, 500);
+	panzoom.zoom(scale, { animate: false });
+	panzoom.pan(panX, panY, { animate: false, force: true });
+	panzoom.setOptions({ contain: "outside" });
 }

@@ -3,6 +3,7 @@ import { createClient } from "@libsql/client";
 import { setPosition } from "@utils/setPosition";
 import { hashSeed } from "@utils/random";
 import { getRandomStar } from "@utils/star";
+import { focusStar } from "@utils/focusStar";
 import renderStar from "@utils/renderStar";
 import Layout from "@layouts/Layout.astro";
 import Star from "@components/Star.astro";
@@ -31,11 +32,12 @@ if (Astro.request.method === "POST") {
 	} else if (parseInt(birthYear) > parseInt(deathYear)) {
 		error = "Birth year must be before death year.";
 	} else {
-		await turso.execute(
+		const result = await turso.execute(
 			"INSERT INTO stars (star_hr, name, birth_year, death_year) VALUES (?, ?, ?, ?)",
 			[star.HR, name, birthYear, deathYear],
 		);
-		return Astro.redirect("/");
+
+		return Astro.redirect("/star/" + result.lastInsertRowid);
 	}
 }
 
@@ -51,7 +53,7 @@ const stars = entries.rows
 		if (!visual) return null;
 
 		const seed = hashSeed(
-			`${row.star_hr}-${row.name}-${row.birth_year}-${row.death_year}`,
+			`${row.star_hr}-${row.name}-${row.birth_year}-${row.death_year}-${row.timestamp}`,
 		);
 		const pos = setPosition(seed);
 
@@ -70,17 +72,15 @@ const stars = entries.rows
 ---
 
 <!-- TODO: 
-- A function to zoom to a specific star by database ID.
-- Add an optional background music.
 - Constellations?
 - Refactor: Convert the viewport to canvas. -->
 <Layout>
 	<div id="viewport" class="bg-sky-dark fixed inset-0 overflow-hidden">
 		<div
 			id="canvas"
-			class="absolute h-[375vmax] w-[375vmax] origin-center md:h-[187.5vmax]"
+			class="absolute h-[375vmax] w-[375vmax] md:h-[187.5vmax]"
 		>
-			<Sky star_intensity="1000" meteor_count="5" />
+			<Sky star_intensity="1000" meteor_count="10" />
 			{
 				stars.map((s) => (
 					<a
@@ -213,7 +213,8 @@ const stars = entries.rows
 	import Panzoom from "@panzoom/panzoom";
 	import { focusStar } from "@utils/focusStar";
 
-	(window as any).focusStar = (id: string | number) => focusStar(panzoom, id);
+	(window as any).focusStar = (id: string | number) =>
+		focusStar(panzoom, id);
 
 	const canvas = document.getElementById("canvas")!;
 	const viewport = document.getElementById("viewport")!;
@@ -224,7 +225,7 @@ const stars = entries.rows
 		contain: "outside",
 		canvas: true,
 		cursor: "arrow",
-		startScale: 1,
+		startScale: 0.2,
 		startX: -(canvas.offsetWidth - window.innerWidth) / 2,
 		startY: -(canvas.offsetHeight - window.innerHeight) / 2,
 	});
@@ -253,4 +254,12 @@ const stars = entries.rows
 	[openBtn, closeBtn, formBackdrop].forEach((el) => {
 		el.addEventListener("click", toggleForm);
 	});
+
+	const urlParams = new URLSearchParams(window.location.search);
+	if (urlParams.get("focus")) {
+		setTimeout(
+			() => focusStar(panzoom, urlParams.get("focus") as string),
+			100,
+		);
+	}
 </script>
