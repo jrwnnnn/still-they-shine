@@ -1,53 +1,69 @@
 ---
 interface Props {
-    color: string;
-    size: number;
-    glow: number;
-    beamLen: number;
-    beamW: number;
-    pulseDelay: string;
-    animateIn?: boolean;
-    animateDelay?: boolean;
+	color: string;
+	size: number;
+	glow: number;
+	beamLen: number;
+	beamW: number;
+	pulseDelay: string;
+	animateIn?: boolean;
+	animateDelay?: boolean;
 }
 
-const { color, size, glow, beamLen, beamW, pulseDelay, animateIn = false, animateDelay = false } = Astro.props;
+const {
+	color,
+	size,
+	glow,
+	beamLen,
+	beamW,
+	pulseDelay,
+	animateIn = false,
+	animateDelay = false,
+} = Astro.props;
 const startDelay = animateDelay ? Math.random() * 2 : 0;
 ---
 
 <div
-    class={`star z-2 cursor-pointer ${animateIn ? 'animate-in' : ''}`}
-    style={`--color:${color};--size:${size}px;--glow:${glow};--beam-len:${beamLen}px;--beam-w:${beamW}px;--pulse-delay:${pulseDelay}s;--start-delay:${startDelay}s;`}
+	class={`star z-2 cursor-pointer ${animateIn ? "animate-in" : ""}`}
+	style={`--color:${color};--size:${size}px;--glow:${glow};--beam-len:${beamLen}px;--beam-w:${beamW}px;--pulse-delay:${pulseDelay}s;--start-delay:${startDelay}s;`}
 >
 </div>
 
 <style is:global>
-    .star {
-        width: var(--size);
-        height: var(--size);
-        border-radius: 50%;
-        background: radial-gradient(circle, #fff 0%, var(--color) 60%, transparent 100%);
-        opacity: var(--glow);
-        box-shadow:
-            0 0 calc(var(--size) * 1) calc(var(--size) * 0.3) var(--color),
-            0 0 calc(var(--size) * 2.5) calc(var(--size) * 0.6) color-mix(in srgb, var(--color) 40%, transparent);
-        transition: filter 0.2s;
-        -webkit-backface-visibility: hidden;
-        backface-visibility: hidden;
-        transform-style: preserve-3d;
-        image-rendering: auto;
+	.star {
+		width: var(--size);
+		height: var(--size);
+		border-radius: 50%;
+		background: radial-gradient(
+			circle,
+			#fff 0%,
+			var(--color) 60%,
+			transparent 100%
+		);
+		opacity: var(--glow);
+		box-shadow:
+			0 0 calc(var(--size) * 1) calc(var(--size) * 0.3) var(--color),
+			0 0 calc(var(--size) * 2.5) calc(var(--size) * 0.6)
+				color-mix(in srgb, var(--color) 40%, transparent);
+		transition: filter 0.2s;
+		-webkit-backface-visibility: hidden;
+		backface-visibility: hidden;
+		transform-style: preserve-3d;
+		image-rendering: auto;
 
-        animation: star-pulse 3s ease-in-out infinite;
-        animation-delay: var(--pulse-delay, 0s);
-    }
+		animation: star-pulse 3s ease-in-out infinite;
+		animation-delay: var(--pulse-delay, 0s);
+	}
 
-    .star.animate-in {
-        opacity: 0;
-        animation:
-            star-appear 0.5s ease-out forwards,
-            star-pulse 3s ease-in-out infinite;
-        animation-delay:
-            var(--start-delay), calc(var(--start-delay) + var(--pulse-delay, 0s) + 0.8s);
-    }
+	.star.animate-in {
+		opacity: 0;
+		animation:
+			star-appear 0.5s ease-out forwards,
+			star-pulse 3s ease-in-out infinite;
+		animation-delay:
+			var(--start-delay),
+			calc(var(--start-delay) + var(--pulse-delay, 0s) + 0.8s);
+	}
 
 	.star:hover {
 		filter: brightness(1.4);
