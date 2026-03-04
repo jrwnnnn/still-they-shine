@@ -17,7 +17,7 @@ const bgMeteors = Array.from({ length: meteor_count }, (_, i) => {
     const x = 50 + seededRandom(seed) * 100;
     const y = -50 + seededRandom(seed + 1) * 100;
     const height = 40 + seededRandom(seed + 2) * 80;
-    const delay = seededRandom(seed + 3) * 20;
+    const delay = seededRandom(seed + 3) * 30;
     const duration = 4 + seededRandom(seed + 4) * 6;
     const brightness = 0.3 + seededRandom(seed + 5) * 0.7;
     return { x, y, height, delay, duration, brightness };
