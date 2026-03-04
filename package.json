@@ -6,7 +6,8 @@
     "astro:dev": "astro dev",
     "astro:build": "astro build",
     "astro:preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "purge": "tsx scripts/purgeOrphanImages.ts"
   },
   "dependencies": {
     "@astrojs/node": "^9.5.2",
@@ -19,5 +20,8 @@
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
   }
 }
