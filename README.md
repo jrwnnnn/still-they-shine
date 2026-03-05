@@ -1,14 +1,22 @@
 <h1 align="center">Still, They Shine</h1>
 
-<p align="center"><i>Quick one-liner about what this project does.</i></p>
+<p align="center"><i>A small space on the internet dedicated to remembering our companions who have traveled onward.</i></p>
 
 <div align="center">
    <!-- FIND PREMADE BADGES HERE: https://github.com/Ileriayo/markdown-badges -->
+
+   <a href="https://astro.build"><img src="https://img.shields.io/badge/astro-%232C2052.svg?style=for-the-badge&logo=astro&logoColor=white"></a>
+   <a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white"></a>
+   <a href="https://typescriptlang.org"><img src="https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white"></a>
    <a href="https://opensource.org/license/mit"><img src="https://img.shields.io/badge/MIT-green?style=for-the-badge"></a>
    <a href="https://github.com/jrwnnnn/still-they-shine"><img src="https://img.shields.io/github/stars/jrwnnnn/still-they-shine?style=for-the-badge"></a>
 </div>
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Still, They Shine is a webapp where anyone can place a star in a shared night sky to honor a beloved pet that has passed away. Each star made is tied to a real star in the night sky, giving every companion a small, lasting place among the stars.
+
+Built with Astro, Tailwind CSS, and TypeScript. Using Node.js 24 LTS for web deployment.
+
+<img src=".github/README/img1.png" align="center">
 
 ## Prerequisites
 
@@ -21,13 +29,13 @@ Make sure the following are installed:
 ```bash
 #Clone the repository
 git clone https://github.com/jrwnnnn/still-they-shine.git
-cd scaffold
+cd still-they-shine
 
 #Install the required dependencies
 npm install
 
 #Run the program
-npm run dev
+npm run astro:dev
 ```
 
 ## License
