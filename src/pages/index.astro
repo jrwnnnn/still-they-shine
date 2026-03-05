@@ -1,10 +1,9 @@
 ---
 import { createClient } from "@libsql/client";
-import sharp from "sharp";
-import { BlobServiceClient } from "@azure/storage-blob";
-import { setPosition } from "../utils/algorithm/perlin";
+import { validateSubmission, isRateLimited } from "@utils/validateForm";
+import { uploadImage } from "@utils/azure";
 import { hashSeed } from "@utils/random";
-import { getRandomStar } from "@utils/star";
+import { setPosition } from "../utils/algorithm/perlin";
 import renderStar from "@utils/renderStar";
 import Layout from "@layouts/Layout.astro";
 import Star from "@components/Star.astro";
@@ -21,66 +20,30 @@ let error = "";
 
 if (Astro.request.method === "POST") {
 	const formData = await Astro.request.formData();
+	const result = await validateSubmission(formData, Astro.clientAddress);
 
-	const token = formData.get("recaptcha_token");
-	const recaptchaVerify = await fetch(
-		`https://www.google.com/recaptcha/api/siteverify?secret=${import.meta.env.RECAPTCHA_SECRET_KEY || process.env.RECAPTCHA_SECRET_KEY}&response=${token}`,
-		{
-			method: "POST",
-		},
-	);
-	const recaptchaData = await recaptchaVerify.json();
-
-	const name = (formData.get("name") as string)?.trim();
-	const birthYear = (formData.get("birth_year") as string)?.trim();
-	const deathYear = (formData.get("death_year") as string)?.trim();
-	const message = (formData.get("message") as string)?.trim();
-	const image = formData.get("image") as File;
-	const star = getRandomStar();
-
-	if (
-		!recaptchaData.success ||
-		recaptchaData.score < 0.5 ||
-		recaptchaData.action !== "submit"
-	) {
-		error = "Security check failed. Please try again.";
-	} else if (image && image.size > 5 * 1024 * 1024) {
-		error = "Image must be under 5MB.";
-	} else if (parseInt(birthYear) > parseInt(deathYear)) {
-		error = "Birth year must be before death year.";
+	if (typeof result === "string") {
+		error = result;
 	} else {
 		let imageUrl = null;
-
-		if (image && image.size > 0) {
-			try {
-				const blobService = BlobServiceClient.fromConnectionString(
-					import.meta.env.AZURE_CONNECTION_STRING ||
-						process.env.AZURE_CONNECTION_STRING,
-				);
-				const containerClient = blobService.getContainerClient("images");
-				const fileName = `${Date.now()}-${image.name.replace(/\s+/g, "-")}`;
-				const blobClient = containerClient.getBlockBlobClient(fileName);
-
-				const arrayBuffer = await image.arrayBuffer();
-				const cleanImageBuffer = await sharp(Buffer.from(arrayBuffer))
-					.rotate()
-					.toBuffer();
-				await blobClient.uploadData(cleanImageBuffer, {
-					blobHTTPHeaders: { blobContentType: image.type },
-				});
-				imageUrl = blobClient.url;
-			} catch (e) {
-				error = "Failed to upload image.";
-			}
+		if (result.image && result.image.size > 0) {
+			imageUrl = await uploadImage(result.image);
+			if (!imageUrl) error = "Failed to upload image.";
 		}
 
 		if (!error) {
-			const result = await turso.execute({
+			const insert = await turso.execute({
 				sql: "INSERT INTO stars (star_hr, name, birth_year, death_year, message, image_url) VALUES (?, ?, ?, ?, ?, ?)",
-				args: [star.HR, name, birthYear, deathYear, message, imageUrl],
+				args: [
+					result.star.HR,
+					result.name,
+					result.birthYear,
+					result.deathYear,
+					result.message,
+					imageUrl,
+				],
 			});
-
-			return Astro.redirect("/?focus=" + result.lastInsertRowid);
+			return Astro.redirect("/?focus=" + insert.lastInsertRowid);
 		}
 	}
 }
@@ -194,7 +157,7 @@ const stars = entries.rows
 		>
 		</div>
 
-		<Form error={error} />
+		<Form error={error} isBlocked={isRateLimited(Astro.clientAddress, true)} />
 	</div>
 </Layout>
 
