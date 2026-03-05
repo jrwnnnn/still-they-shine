@@ -180,12 +180,8 @@ if (Astro.request.method === "POST") {
 			</form>
 		</div>
 	</main>
-	<audio id="ambient" loop>
-		<source src="/sounds/Stellas Departure - Max LL.mp3" type="audio/mpeg" />
-	</audio>
 </Layout>
 
-<script src="../../utils/ambientSound.ts"></script>
 <script>
 	document.getElementById("reportBtn")!.addEventListener("click", () => {
 		window.alert("Thank you for your report. We will review it shortly.");
