@@ -16,6 +16,8 @@ jobs:
       contents: read #This is required for actions/checkout
 
     if: "!contains(github.event.head_commit.message, '[skip deploy]')"
+    env:
+      PUBLIC_RECAPTCHA_SITE_KEY: ${{ secrets.PUBLIC_RECAPTCHA_SITE_KEY }}
     steps:
       - uses: actions/checkout@v4
 
