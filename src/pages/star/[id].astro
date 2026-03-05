@@ -28,7 +28,7 @@ const color = visual?.color ?? "#ffffff";
 const starName = starData?.Name || starData?.ID;
 const constellation =
 	constellations[starData.Con as keyof typeof constellations];
-const spectralType = starData?.["Sp Type"] || "—";
+const magnitude = starData?.["Vmag"] || "—";
 const distance = starData?.Distance ? `${starData.Distance} ly` : "Unknown";
 
 const seeds = [1003, 2507, 3714, 4221, 5832, 6947, 8123, 9456];
@@ -49,7 +49,7 @@ if (Astro.request.method === "POST") {
 
 <Layout title={row.name as string} robots="noindex, nofollow">
 	<div class="fixed inset-0 overflow-hidden">
-		<Sky star_intensity="50" nebula={false} meteor_count="1" />
+		<Sky star_intensity="50" nebula={row.image_url ? false : true} meteor_count="1" />
 		{
 			stars.map((s) => (
 				<div class="absolute scale-[0.3]" style={`left:${s.x}%;top:${s.y}%;`}>
@@ -152,8 +152,8 @@ if (Astro.request.method === "POST") {
 					</div>
 					<div class="h-px w-full bg-white/5"></div>
 					<div class="flex items-center justify-between">
-						<span class="text-sm text-white/40">Spectral Type</span>
-						<span class="text-sm text-white/70">{spectralType}</span>
+						<span class="text-sm text-white/40">Magnitude</span>
+						<span class="text-sm text-white/70">{magnitude}</span>
 					</div>
 					<div class="h-px w-full bg-white/5"></div>
 					<div class="flex items-center justify-between">
