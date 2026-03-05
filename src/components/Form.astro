@@ -107,7 +107,7 @@ const { error } = Astro.props;
 
 <script
 	is:inline
-	src={`https://www.google.com/recaptcha/api.js?render=${import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY}`}
+	src={`https://www.google.com/recaptcha/api.js?render=${import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY || process.env.PUBLIC_RECAPTCHA_SITE_KEY}`}
 ></script>
 <script>
 	interface Window {
@@ -126,7 +126,7 @@ const { error } = Astro.props;
 
 			grecaptcha.ready(() => {
 				grecaptcha
-					.execute(import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY, {
+					.execute(import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY || process.env.PUBLIC_RECAPTCHA_SITE_KEY, {
 						action: "submit",
 					})
 					.then((token: string) => {
