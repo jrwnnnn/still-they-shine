@@ -109,6 +109,7 @@ const stars = entries.rows
 	})
 	.filter((s): s is NonNullable<typeof s> => s !== null);
 ---
+
 <Layout>
 	<div id="viewport" class="bg-sky-dark fixed inset-0 overflow-hidden">
 		<!-- TODO: Canvas (the final boss) -->
@@ -208,8 +209,6 @@ const stars = entries.rows
 	import Panzoom from "@panzoom/panzoom";
 	import { focusStar } from "@utils/focusStar";
 
-	(window as any).focusStar = (id: string | number) => focusStar(panzoom, id);
-
 	const canvas = document.getElementById("canvas")!;
 	const viewport = document.getElementById("viewport")!;
 
@@ -228,6 +227,13 @@ const stars = entries.rows
 		passive: false,
 	});
 
+	(window as any).focusStar = (id: string | number) => focusStar(panzoom, id);
+	const urlParams = new URLSearchParams(window.location.search);
+	if (urlParams.get("focus")) {
+		setTimeout(() => focusStar(panzoom, urlParams.get("focus") as string), 100);
+	}
+</script>
+<script>
 	const formModal = document.getElementById("formModal")!;
 	const formBackdrop = document.getElementById("formBackdrop")!;
 	const openBtn = document.getElementById("openBtn")!;
@@ -248,9 +254,4 @@ const stars = entries.rows
 	[openBtn, closeBtn, formBackdrop].forEach((el) => {
 		el.addEventListener("click", toggleForm);
 	});
-
-	const urlParams = new URLSearchParams(window.location.search);
-	if (urlParams.get("focus")) {
-		setTimeout(() => focusStar(panzoom, urlParams.get("focus") as string), 100);
-	}
 </script>
