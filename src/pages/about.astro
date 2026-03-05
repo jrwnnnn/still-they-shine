@@ -11,7 +11,7 @@ const stars = generateStaticStars(seeds);
 <Layout>
 	<main>
 		<div class="relative mb-15 h-[50vh] w-full">
-			<Sky star_intensity="50" meteor_count="0"/>
+			<Sky star_intensity="50" meteor_count="0" />
 			{
 				stars.map((s) => (
 					<div class="absolute" style={`left:${s.x}%;top:${s.y}%;`}>
@@ -32,23 +32,20 @@ const stars = generateStaticStars(seeds);
 		<div class="lg:px-40">
 			<div class="mb-10">
 				<p class="mb-6 text-3xl font-medium text-white">Still, They Shine</p>
-				<div class="text-gray-400">
-					<p>
-						Inspired by Spiritfarer and Outer Wilds, this site is a quiet space
-						to remember the companions who have traveled onward. <br />Here, you
-						can share a memory of a pet who has passed away, and they will be
-						appointed to a real star in the night sky. It is a simple, way to
-						honor their journey, keeping their light shining above us so they
-						are never truly gone.
-					</p>
-				</div>
+				<p class="mb-6 text-gray-400">
+					Inspired by Spiritfarer, this site is a quiet space to remember the
+					companions who have traveled onward. <br />Here, you can share a
+					memory of a pet who has passed away, and they will be appointed to a
+					real star in the night sky. It is a simple, way to honor their
+					journey, keeping their light shining above us so they are never truly
+					gone.
+				</p>
 			</div>
 			<div class="flex items-center gap-5">
 				<a
 					href="https://github.com/jrwnnnn/graveyard-of-stars"
 					target="_blank"
 					rel="noopener noreferrer"
-					class="hover:underline"
 				>
 					<img
 						class="h-6 object-contain invert"
@@ -57,15 +54,18 @@ const stars = generateStaticStars(seeds);
 						alt="GitHub Icon"
 					/>
 				</a>
-				<a
-					href="https://jrwnnnn.me"
-					target="_blank"
-					rel="noopener noreferrer"
-					class="hover:underline"
-				>
+				<a href="https://jrwnnnn.me" target="_blank" rel="noopener noreferrer">
 					<img
 						class="h-7 object-contain"
 						src="/icons/jrwnnnn.svg"
+						loading="lazy"
+						alt="Website Icon"
+					/>
+				</a>
+				<a href="legal">
+					<img
+						class="h-6 object-contain invert"
+						src="/icons/scales.svg"
 						loading="lazy"
 						alt="Website Icon"
 					/>

@@ -1,0 +1,181 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Star from "@components/Star.astro";
+import Sky from "@components/Sky.astro";
+import { generateStaticStars } from "@utils/generateStaticStars";
+
+const seeds = [4321, 8720, 6223, 7812, 3456, 9876, 4432];
+const stars = generateStaticStars(seeds);
+---
+
+<Layout>
+	<main>
+		<div class="relative mb-15 h-[30vh] w-full">
+			<Sky star_intensity="50" meteor_count="0" />
+			{
+				stars.map((s) => (
+					<div class="absolute" style={`left:${s.x}%;top:${s.y}%;`}>
+						<Star
+							color={s.color}
+							size={s.size}
+							glow={s.glow}
+							beamLen={s.beamLen}
+							beamW={s.beamW}
+							pulseDelay={s.pulseDelay}
+							animateIn={true}
+							animateDelay={true}
+						/>
+					</div>
+				))
+			}
+		</div>
+		<div class="lg:px-30">
+			<div class="mb-10 text-gray-400">
+				<!-- <h1 class="mb-8 text-4xl font-medium text-white">Legal Stuff</h1> -->
+
+				<h2 class="mt-8 mb-5 text-4xl font-medium text-white">
+					Terms of Service
+				</h2>
+				
+				<h3 class="mt-4 font-medium text-gray-200">1. Acceptance of Terms</h3>
+				<p class="mb-4">
+					By accessing or using this website, you agree to these Terms. This is
+					an open-source project provided “as-is” without warranties of any
+					kind. Use of the site is voluntary and at your own risk.
+				</p>
+
+				<h3 class="mt-4 font-medium text-gray-200">2. User Submissions</h3>
+				<p class="mb-4">
+					All submitted content is final and permanently public. This website
+					does not support accounts, editing, or deletion of submissions. By
+					submitting content, you acknowledge and agree that it will be publicly
+					visible and cannot be edited or deleted by users, except where
+					required by applicable law.
+				</p>
+
+				<h3 class="mt-4 font-medium text-gray-200">3. Content Moderation</h3>
+				<p class="mb-4">
+					The developer reserves the right, at sole discretion, to remove or
+					restrict any content that is reported, inappropriate, unlawful, or
+					otherwise deemed unsuitable for the platform. Removal decisions may be
+					made without prior notice.
+				</p>
+
+				<h3 class="mt-4 font-medium text-gray-200">4. Third-Party Services</h3>
+				<p class="mb-4">
+					This site is deployed on Microsoft Azure and uses Google reCAPTCHA v3.
+					These third-party services may collect and process data according to
+					their own policies. The developer is not responsible for their data
+					handling practices.
+				</p>
+
+				<h3 class="mt-4 font-medium text-gray-200">
+					5. Limitation of Liability
+				</h3>
+				<p class="mb-2">
+					To the fullest extent permitted by law, the developer shall not be
+					liable for any direct, indirect, incidental, consequential, or special
+					damages arising from:
+				</p>
+				<ul class="mb-4 ml-6 list-disc space-y-1">
+					<li>Use of the website</li>
+					<li>Public visibility of submitted content</li>
+					<li>Data submitted by users</li>
+					<li>Reliance on site information</li>
+					<li>Actions of third-party services</li>
+				</ul>
+				<p class="mb-4">Use of this platform is entirely at your own risk.</p>
+
+				<h3 class="mt-4 font-medium text-gray-200">6. Indemnification</h3>
+				<p class="mb-4">
+					Users agree to defend, indemnify, and hold harmless the developer from
+					and against any claims, damages, liabilities, losses, or expenses
+					(including legal fees) arising from content submitted by the user,
+					including but not limited to claims of copyright infringement,
+					unlawful content, or violation of third-party rights.
+				</p>
+
+				<h3 class="mt-4 font-medium text-gray-200">7. License Grant</h3>
+				<p class="mb-4">
+					By submitting content, you grant the developer a non-exclusive,
+					royalty-free, worldwide license to host, display, and process the
+					submitted text and images including for purposes of operating,
+					promoting, and archiving the service.
+				</p>
+
+				<h3 class="mt-4 font-medium text-gray-200">8. Governing Law</h3>
+				<p class="mb-4">
+					These Terms shall be governed by and construed in accordance with the
+					laws of the Republic of the Philippines.
+				</p>
+
+				<h3 class="mt-4 font-medium text-gray-200">9. Contact</h3>
+				<p class="mb-4">
+					For legal concerns or inquiries, you may contact the developer at
+					email@example.com
+				</p>
+
+				<hr class="my-10 border-gray-700" />
+
+				<h2 class="mt-8 mb-4 text-4xl font-medium text-white">
+					Privacy Policy
+				</h2>
+
+				<h3 class="mt-4 font-medium text-gray-200">1. Data Collection</h3>
+				<p class="mb-2">
+					The site collects only the following information when a submission is
+					made:
+				</p>
+				<ul class="mb-4 ml-6 list-disc space-y-1">
+					<li>Pet’s name</li>
+					<li>Birth year</li>
+					<li>Death year</li>
+					<li>Optional message</li>
+					<li>Optional image</li>
+				</ul>
+				<p class="mb-4">
+					The site does not require accounts, does not use analytics, and does
+					not collect unnecessary personal data.
+				</p>
+
+				<h3 class="mt-4 font-medium text-gray-200">2. Image Processing</h3>
+				<p class="mb-4">
+					Uploaded images are processed to remove GPS and EXIF metadata before
+					storage to help protect user privacy. The website is delivered over
+					HTTPS for secure transmission.
+				</p>
+
+				<h3 class="mt-4 font-medium text-gray-200">
+					3. Public Disclosure Consent
+				</h3>
+				<p class="mb-2">By submitting content, you explicitly consent to:</p>
+				<ul class="mb-4 ml-6 list-disc space-y-1">
+					<li>Public display of the submitted data</li>
+					<li>Global accessibility of the content</li>
+					<li>Permanent public visibility</li>
+				</ul>
+
+				<h3 class="mt-4 font-medium text-gray-200">4. Cookies and Tracking</h3>
+				<p class="mb-4">
+					This website does not use advertising or tracking cookies. However,
+					Google reCAPTCHA may collect technical information as part of its
+					functionality. Its data collection is governed by its own policies.
+				</p>
+
+				<h3 class="mt-4 font-medium text-gray-200">5. Data Retention</h3>
+				<p class="mb-4">
+					Submitted content remains publicly available for as long as the
+					project is active. If the project is discontinued, data may be
+					temporarily stored before permanent deletion.
+				</p>
+
+				<h3 class="mt-4 font-medium text-gray-200">6. Children’s Privacy</h3>
+				<p class="mb-4">
+					This website is not directed toward children. No age verification is
+					performed. The developer does not knowingly collect information from
+					individuals under 13.
+				</p>
+			</div>
+		</div>
+	</main>
+</Layout>
