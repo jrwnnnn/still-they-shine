@@ -18,6 +18,7 @@ Built with Astro, Tailwind CSS, and TypeScript. Using Node.js 24 LTS for web dep
 
 <img src=".github/README/img1.png" align="center">
 
+
 ## Prerequisites
 
 Make sure the following are installed:
