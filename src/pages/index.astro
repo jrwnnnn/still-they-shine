@@ -122,8 +122,12 @@ const stars = entries.rows
 				stars.map((s) => (
 					<a
 						href={`/star/${s.id}`}
-						class="absolute flex flex-col items-center"
+						class="star-link absolute flex flex-col items-center"
 						style={`left:${s.x}%;top:${s.y}%; will-change: opacity, transform;`}
+						data-star={s.starName}
+						data-name={s.name}
+						data-years={`${s.birthYear} – ${s.deathYear}`}
+						data-color={s.color}
 					>
 						<div class="peer" id={s.id as string}>
 							<Star
@@ -137,20 +141,18 @@ const stars = entries.rows
 								animateDelay={true}
 							/>
 						</div>
-
-						<div class="focused:opacity-100 pointer-events-none z-25 mt-5 text-center text-[0.8rem] leading-snug whitespace-nowrap opacity-0 transition-opacity peer-hover:opacity-100">
-							<p class="text-white/50">{s.starName}</p>
-							<p class="text-sm! font-medium" style={`color:${s.color};`}>
-								{s.name}
-							</p>
-							<p class="text-white/40">
-								{s.birthYear} – {s.deathYear}
-							</p>
-						</div>
 					</a>
 				))
 			}
 		</div>
+	</div>
+	<div
+		id="tooltip"
+		class="pointer-events-none fixed z-60 mt-2 -translate-x-1/2 text-center text-[0.8rem] leading-snug whitespace-nowrap opacity-0 transition-opacity"
+	>
+		<p class="text-white/50"></p>
+		<p class="text-sm! font-medium"></p>
+		<p class="text-white/40"></p>
 	</div>
 	<div
 		class="pointer-events-none fixed inset-0 z-50 flex h-full flex-col justify-between p-5"
@@ -162,22 +164,13 @@ const stars = entries.rows
 			>
 				Still, They Shine
 			</a>
-			<p class="text-xs opacity-50">{stars.length} companions watching from above</p>
+			<p class="text-xs opacity-50">
+				{stars.length} companions watching from above
+			</p>
 		</div>
 		<div
 			class="flex flex-col items-end gap-2 self-end md:flex-row md:items-center"
 		>
-			<!-- <button
-				onclick="document.getElementById('ambient').muted = !document.getElementById('ambient').muted"
-				class="pointer-events-auto cursor-pointer rounded-full bg-white/5 px-4 py-2 text-white hover:bg-white/10"
-			>
-				<img
-					class="h-5 object-contain invert"
-					src="/icons/sound.svg"
-					loading="lazy"
-					alt="GitHub Icon"
-				/>
-			</button> -->
 			<button
 				id="openBtn"
 				class="pointer-events-auto cursor-pointer rounded-full bg-white/5 px-4 py-2 text-white hover:bg-white/10"
@@ -222,11 +215,62 @@ const stars = entries.rows
 		passive: false,
 	});
 
+	let startX = 0,
+		startY = 0;
+
+	viewport.addEventListener("pointerdown", (e) => {
+		startX = e.clientX;
+		startY = e.clientY;
+	});
+
+	viewport.addEventListener(
+		"click",
+		(e) => {
+			if (Math.hypot(e.clientX - startX, e.clientY - startY) > 5) {
+				e.preventDefault();
+			}
+		},
+		{ capture: true },
+	);
+
 	(window as any).focusStar = (id: string | number) => focusStar(panzoom, id);
 	const urlParams = new URLSearchParams(window.location.search);
 	if (urlParams.get("focus")) {
 		setTimeout(() => focusStar(panzoom, urlParams.get("focus") as string), 100);
 	}
+</script>
+<script>
+	const tooltip = document.getElementById("tooltip") as HTMLElement;
+	const viewport = document.getElementById("viewport") as HTMLElement;
+
+	viewport.addEventListener("mouseover", (e: MouseEvent) => {
+		const target = e.target as HTMLElement;
+		const star = target.closest(".star-link") as HTMLElement | null;
+		if (!star) {
+			tooltip.classList.replace("opacity-100", "opacity-0");
+			return;
+		}
+
+		const rect = star.getBoundingClientRect();
+		tooltip.style.left = `${rect.left + rect.width / 2}px`;
+		tooltip.style.top = `${rect.bottom + 13}px`;
+
+		tooltip.children[0].textContent = star.dataset.star || "";
+		tooltip.children[1].textContent = star.dataset.name || "";
+		(tooltip.children[1] as HTMLElement).style.color = star.dataset.color || "";
+		tooltip.children[2].textContent = star.dataset.years || "";
+
+		tooltip.classList.replace("opacity-0", "opacity-100");
+	});
+
+	viewport.addEventListener("pointerdown", () =>
+		tooltip.classList.replace("opacity-100", "opacity-0"),
+	);
+	viewport.addEventListener(
+		"wheel",
+		() => tooltip.classList.replace("opacity-100", "opacity-0"),
+		{ passive: true },
+	);
 </script>
 <script>
 	const formModal = document.getElementById("formModal")!;
