@@ -1,5 +1,6 @@
 ---
 import { createClient } from "@libsql/client";
+import sharp from "sharp";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { setPosition } from "../utils/algorithm/perlin";
 import { hashSeed } from "@utils/random";
@@ -43,8 +44,8 @@ if (Astro.request.method === "POST") {
 		recaptchaData.action !== "submit"
 	) {
 		error = "Security check failed. Please try again.";
-	} else if (image && image.size > 2 * 1024 * 1024) {
-		error = "Image must be under 2MB.";
+	} else if (image && image.size > 5 * 1024 * 1024) {
+		error = "Image must be under 5MB.";
 	} else if (parseInt(birthYear) > parseInt(deathYear)) {
 		error = "Birth year must be before death year.";
 	} else {
@@ -60,7 +61,10 @@ if (Astro.request.method === "POST") {
 				const blobClient = containerClient.getBlockBlobClient(fileName);
 
 				const arrayBuffer = await image.arrayBuffer();
-				await blobClient.uploadData(arrayBuffer, {
+				const cleanImageBuffer = await sharp(Buffer.from(arrayBuffer))
+					.rotate()
+					.toBuffer();
+				await blobClient.uploadData(cleanImageBuffer, {
 					blobHTTPHeaders: { blobContentType: image.type },
 				});
 				imageUrl = blobClient.url;
