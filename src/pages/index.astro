@@ -43,7 +43,7 @@ if (Astro.request.method === "POST") {
 		recaptchaData.score < 0.5 ||
 		recaptchaData.action !== "submit"
 	) {
-		error = "Security check failed: ${JSON.stringify(recaptchaData)}";
+		error = `Security check failed: ${JSON.stringify(recaptchaData)}`;
 	} else if (image && image.size > 5 * 1024 * 1024) {
 		error = "Image must be under 5MB.";
 	} else if (parseInt(birthYear) > parseInt(deathYear)) {
@@ -54,7 +54,8 @@ if (Astro.request.method === "POST") {
 		if (image && image.size > 0) {
 			try {
 				const blobService = BlobServiceClient.fromConnectionString(
-					import.meta.env.AZURE_CONNECTION_STRING || process.env.AZURE_CONNECTION_STRING,
+					import.meta.env.AZURE_CONNECTION_STRING ||
+						process.env.AZURE_CONNECTION_STRING,
 				);
 				const containerClient = blobService.getContainerClient("images");
 				const fileName = `${Date.now()}-${image.name.replace(/\s+/g, "-")}`;
