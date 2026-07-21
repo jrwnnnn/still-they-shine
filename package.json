@@ -11,7 +11,7 @@
 		"typecheck": "astro check"
 	},
 	"dependencies": {
-		"@astrojs/node": "^10.1.0",
+		"@astrojs/node": "^11.0.2",
 		"@astrojs/vercel": "^10.0.4",
 		"@azure/storage-blob": "^12.31.0",
 		"@libsql/client": "^0.17.2",
